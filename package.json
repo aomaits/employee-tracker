@@ -11,6 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "inquirer": "^8.2.4"
+    "filesystem": "^1.0.1",
+    "inquirer": "^8.2.4",
+    "mysql2": "^3.5.2"
   }
 }
