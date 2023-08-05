@@ -30,6 +30,7 @@ inquirer
   .then((response) => {   
     switch (response.license) {
         case 'View All Departments':
+            // NO NEED FOR API CALL! YOU'RE NOT TALKING FRONT END TO BACK END!
             app.get('/api/view-departments', (req, res) => {
                 const sql = `SELECT * FROM department`;
                 db.query(sql, (err, rows) => {
