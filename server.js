@@ -4,6 +4,7 @@ const fs = require('fs');
 const express = require('express');
 // Import and require mysql2
 const mysql = require('mysql2');
+const start = true;
 
 // Connect to employees database
 const db = mysql.createConnection(
@@ -17,8 +18,9 @@ const db = mysql.createConnection(
     console.log(`Connected to the employees_db database. (remove this log later!)`)
   );
 
-inquirer
-  .prompt([
+function employeeTracker () {
+    inquirer
+    .prompt([
     {
         type: 'list',
         message: 'Welcome to the Employee Manager. What would you like to do?',
@@ -26,40 +28,50 @@ inquirer
         choices: ['View All Departments', 'View All Roles', 'View All Employees', 'Add A Department', 'Add A Role', 'Add An Employee', 'Update An Employee Role'],
     }
 
-  ])
-  .then((response) => {   
-    switch (response.license) {
-        case 'View All Departments':
-            app.get('/api/view-departments', (req, res) => {
-                const sql = `SELECT * FROM department`;
-                db.query(sql, (err, rows) => {
+    ])
+
+    .then((response) => {   
+        switch (response.options) {
+            case 'View All Departments':
+                // mysql commands to see the department table (which will list all departments)
+                db.query(`SELECT * FROM department`, (err, result) => {
                     if (err) {
-                        res.status(500).json({ error: err.message });
-                        return;
+                        console.log(err);
                     }
-                    res.json({
-                        message: 'success',
-                        data: rows
-                    });
+                    console.table(result);
                 });
-            });
+                break;
+        
+            case 'View All Roles': 
+                db.query(`SELECT 
+                roles.title AS job_title, 
+                roles.id AS role_id,  
+                department.department_name AS department_name,
+                roles.salary AS salary
+                FROM roles
+                INNER JOIN department
+                ON roles.department_id = department.id
+                ORDER BY roles.salary DESC;`, (err, response) => {
+                    if (err) {
+                        console.log(err);
+                    } 
+                        console.table(response)
+                });
+                break;
 
-            break;
-    }
+            case 'View All Employees':
+            case 'Add A Department':
+            case 'Add A Role':
+            case 'Add An Employee':
+            case 'Update An Employee Role':
+                console.log("Other options selected")
+            }
+        })
+}
 
+console.log("did this happen at the end?")
 
-        // case 'MIT License':
-//             var chosenLicenseLink = "[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)";
-//             projectLicense = 'MIT License';
-//             break;
-//         case 'Creative Commons Zero v1.0 Universal':
-//             var chosenLicenseLink = "[![License: CC0-1.0](https://img.shields.io/badge/License-CC0_1.0-lightgrey.svg)](http://creativecommons.org/publicdomain/zero/1.0/)";
-//             projectLicense = 'Creative Commons Zero v1.0 Universal';
-//             break;
-//         case 'Mozilla Public License 2.0':
-//             var chosenLicenseLink = "[![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)";
-//             projectLicense = 'Mozilla Public License 2.0';
-    })
+employeeTracker();
 
 //     const filename = `${response.title.toLowerCase()}.md`;
 //     const projectTitle = response.title;
