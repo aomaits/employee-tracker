@@ -1,8 +1,11 @@
--- View all departments
-SELECT * FROM department;
-
 -- view all roles
     -- left join roles (keeping all fields from that table minus the overlap) to department
+    -- THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
+
+    SELECT roles.title AS job_title, roles.id AS role_id, roles.salary AS salary 
+FROM roles 
+LEFT JOIN department ON roles.department_id = department.id; --close, doesn't get the department name
+
 
 -- view all employees
     -- join all three tables minus the id fields? to drop what they have in common? 

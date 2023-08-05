@@ -5,16 +5,16 @@ VALUES ("Finance"),
         ("Engineering");
 
 INSERT INTO roles (title, salary, department_id)
-VALUES ("CFO", 110.000, 1),
-    ("CMO", 120.000, 2),
-    ("VP", 125.000, 3),
-    ("Financial Analyst", 88.000, 1),
-    ("Accountant", 91.000, 1),
-    ("Account Executive", 75.000, 2),
-    ("Brand Management", 83.000, 2),
-    ("Sales Representative", 77.000, 3),
-    ("Account Manager", 80.000, 3),
-    ("Design Engineer", 85., 4);
+VALUES ("CFO", 110000, 1),
+    ("CMO", 120000, 2),
+    ("VP", 125000, 3),
+    ("Financial Analyst", 88000, 1),
+    ("Accountant", 91000, 1),
+    ("Account Executive", 75000, 2),
+    ("Brand Management", 83000, 2),
+    ("Sales Representative", 77000, 3),
+    ("Account Manager", 80000, 3),
+    ("Design Engineer", 85000, 4);
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ("Alex", "Morgan", 2, null),
