@@ -39,6 +39,7 @@ function employeeTracker () {
                         console.log(err);
                     }
                     console.table(result);
+                    employeeTracker();
                 });
                 break;
         
@@ -56,6 +57,7 @@ function employeeTracker () {
                         console.log(err);
                     } 
                         console.table(response)
+                        employeeTracker();
                 });
                 break;
 
