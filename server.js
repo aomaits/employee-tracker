@@ -62,6 +62,21 @@ function employeeTracker () {
                 break;
 
             case 'View All Employees':
+                db.query(`SELECT employee.id, employee.first_name, employee.last_name, 
+                roles.title, department.department_name, roles.salary, employee.manager_id
+                FROM employee
+                LEFT JOIN roles
+                ON employee.role_id = roles.id 
+                LEFT JOIN department
+                ON department.id = roles.department_id`, (err, response) => {
+                    if (err) {
+                        console.log(err);
+                    } 
+                        console.table(response)
+                        employeeTracker();
+                });
+                break;
+                
             case 'Add A Department':
             case 'Add A Role':
             case 'Add An Employee':
