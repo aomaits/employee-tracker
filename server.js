@@ -70,12 +70,14 @@ function employeeTracker () {
                 // ON employee1.manager_id = employee.id`)
 
                 db.query(`SELECT employee.id AS 'Employee ID', CONCAT(employee.first_name, ' ', employee.last_name) AS 'Employee Name',
-                roles.title AS 'Job Title', department.department_name AS 'Department', roles.salary AS 'Salary'
+                roles.title AS 'Job Title', department.department_name AS 'Department', roles.salary AS 'Salary', 
+                CONCAT(manager.first_name, ' ', manager.last_name) AS Manager
                 FROM employee
                 LEFT JOIN roles
                 ON employee.role_id = roles.id 
-                LEFT JOIN department
-                ON department.id = roles.department_id
+                LEFT JOIN department 
+                ON roles.department_id = department.id
+                LEFT JOIN employee manager on manager.id = employee.manager_id
                 ORDER BY roles.salary DESC`, (err, response) => {
                     if (err) {
                         console.log(err);
@@ -87,18 +89,39 @@ function employeeTracker () {
 
             case 'Add A Department':
                 inquirer.prompt([
-                    // ask for input, pull the value, plug it in below
+                        {
+                            type: 'input',
+                            name: 'name',
+                            message: 'Enter the department name you would like to add:',
+                        }
                 ])
-            db.query(`INSERT INTO department (department.department_name) VALUES ('Human Resources')`, (err, response) => {
-                if (err) {
-                    console.log(err);
-                } 
-                    console.table(response)
-                    employeeTracker();
-            });
-            break;
+                .then(function (answers) {
+                    const newDept = answers.name;
+                    db.query(`INSERT INTO department (department.department_name) VALUES ('${newDept}')`, (err, response) => {
+                        if (err) {
+                            console.log(err);
+                        }
+                    }) 
+                }).then(
+                        // This is firing as soon as the prompt comes through...why isn't it waiting for a response?
+                db.query(`SELECT * FROM department`, (err, response) => {
+                    if (err) {
+                        console.log(err);
+                    } 
+                        console.table(response)
+                        employeeTracker();
+                }));
+                break;
                 
             case 'Add A Role':
+                db.query(`INSERT INTO roles (title, salary, department_id) VALUES ('Financial Analyst', 86000, 1`, (err, response) => {
+                    if (err) {
+                        console.log(err);
+                    } 
+                    console.table(response)
+                    employeeTracker();
+});
+break;
             case 'Add An Employee':
             case 'Update An Employee Role':
                 console.log("Other options selected")
