@@ -5,6 +5,7 @@ const express = require('express');
 // Import and require mysql2
 const mysql = require('mysql2');
 const start = true;
+const consoleTable = require('console.table');
 
 // Connect to employees database
 const db = mysql.createConnection(
@@ -45,10 +46,10 @@ function employeeTracker () {
         
             case 'View All Roles': 
                 db.query(`SELECT 
-                roles.title AS job_title, 
-                roles.id AS role_id,  
-                department.department_name AS department_name,
-                roles.salary AS salary
+                roles.title AS 'Job Title', 
+                roles.id AS 'Role ID',
+                department.department_name AS 'Department Name',
+                roles.salary AS 'Salary'
                 FROM roles
                 INNER JOIN department
                 ON roles.department_id = department.id
@@ -62,13 +63,15 @@ function employeeTracker () {
                 break;
 
             case 'View All Employees':
-                db.query(`SELECT employee.id, employee.first_name, employee.last_name, 
-                roles.title, department.department_name, roles.salary, employee.manager_id
+                db.query(`SELECT employee.id AS 'Employee ID', CONCAT(employee.first_name, ' ', employee.last_name) AS 'Employee Name',
+                roles.title AS 'Job Title', department.department_name AS 'Department', roles.salary AS 'Salary', 
+                CONCAT((SELECT employee.first_name WHERE employee.id = employee.manager_id), ' ') AS 'Manager'
                 FROM employee
                 LEFT JOIN roles
                 ON employee.role_id = roles.id 
                 LEFT JOIN department
-                ON department.id = roles.department_id`, (err, response) => {
+                ON department.id = roles.department_id
+                ORDER BY roles.salary DESC`, (err, response) => {
                     if (err) {
                         console.log(err);
                     } 
@@ -76,8 +79,20 @@ function employeeTracker () {
                         employeeTracker();
                 });
                 break;
-                
+
             case 'Add A Department':
+                inquirer.prompt([
+                    // ask for input, pull the value, plug it in below
+                ])
+            db.query(`INSERT INTO department (department.department_name) VALUES ('Human Resources')`, (err, response) => {
+                if (err) {
+                    console.log(err);
+                } 
+                    console.table(response)
+                    employeeTracker();
+            });
+            break;
+                
             case 'Add A Role':
             case 'Add An Employee':
             case 'Update An Employee Role':
