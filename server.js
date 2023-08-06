@@ -63,9 +63,14 @@ function employeeTracker () {
                 break;
 
             case 'View All Employees':
+                // Will return the manager's name as a column
+                // const managerName = db.query(`SELECT CONCAT(employee.first_name,' ',employee.last_name) AS 'Manager Name'
+                // FROM employee AS employee1
+                // JOIN employee
+                // ON employee1.manager_id = employee.id`)
+
                 db.query(`SELECT employee.id AS 'Employee ID', CONCAT(employee.first_name, ' ', employee.last_name) AS 'Employee Name',
-                roles.title AS 'Job Title', department.department_name AS 'Department', roles.salary AS 'Salary', 
-                CONCAT((SELECT employee.first_name WHERE employee.id = employee.manager_id), ' ') AS 'Manager'
+                roles.title AS 'Job Title', department.department_name AS 'Department', roles.salary AS 'Salary'
                 FROM employee
                 LEFT JOIN roles
                 ON employee.role_id = roles.id 
