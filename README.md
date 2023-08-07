@@ -3,6 +3,10 @@
 ## Description
 This back-end application allows a user to manipulate an employee database. This project was created to give the user more control over their employee database and the ability to interact with that data in a simple manner. 
 
+Below is the base database I created for the project, as laid out in a google document which I referenced throughout the process. I color-coded the connected foreign-primary keys: 
+
+![database schema for the employee tracker project](./assets/mySchema.jpg)
+
 ## Installation
 In order to utilize this application, the user will need to install all node packages. They will also need to input their mysql username and password on lines 14 and 15 of the server.js file. 
 
