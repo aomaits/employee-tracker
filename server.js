@@ -11,7 +11,7 @@ const consoleTable = require('console.table');
 const db = mysql.createConnection(
     {
         host: 'localhost',
-        // MySQL username,
+        // TODO: Add your mysql username and password here! 
         user: 'root',
         password: 'root',
         database: 'employees_db'
