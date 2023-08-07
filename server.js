@@ -12,8 +12,8 @@ const db = mysql.createConnection(
     {
         host: 'localhost',
         // TODO: Add your mysql username and password here! 
-        user: 'root',
-        password: 'root',
+        user: '',
+        password: '',
         database: 'employees_db'
     },
 );
@@ -39,6 +39,7 @@ function employeeTracker () {
                         console.log(err);
                     }
                     console.table(result);
+                    // return the user to the home menu after the result has rendered
                     employeeTracker();
                 });
                 break;
@@ -90,20 +91,20 @@ function employeeTracker () {
                         }
                 ])
                 .then(function (answers) {
+                    // use a constant to hold onto the user's answer and add it to the sql query below
                     const newDept = answers.newDept;
                     db.promise().query(
                         `INSERT INTO department (department.department_name) VALUES ('${newDept}')`);
                     console.log(`'${newDept}' has been added to Departments.`)
                 }) 
-                .then(db.promise().query(`SELECT * FROM department`))
                 .then(() => {
-                    
                     employeeTracker();
                 })
                 break;
                 
             case 'Add A Role':
                 db.query(`SELECT * FROM department`, function (err, results) {
+                    // map over the two columns in the department table and pull out the values for each to provide choice in the third prompt below
                     const deptsArray = results.map(({ department_name, id }) => ({ 'name': department_name, 'value': id }))
                     
                     inquirer.prompt([
@@ -131,6 +132,7 @@ function employeeTracker () {
                             choices: deptsArray,
                         }
                     ]).then(function (answers) {
+                        // using variables here to insert the user's selections into the mysql call
                         db.query('INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)', [answers.newRole, answers.newRoleSalary, answers.departmentOptions], (err, results) => {
                             console.log(`${answers.newRole} has been added to the roles table.`);
                             employeeTracker();
@@ -140,11 +142,13 @@ function employeeTracker () {
                 break;
 
             case 'Add An Employee':      
-                db.query(`SELECT * FROM roles`, function (err, results) {        
+                db.query(`SELECT * FROM roles`, function (err, results) { 
+                    // creates an array from the roles table
                     const roleArr = results.map(({ title, id }) => ({ 'name': title, 'value': id }))
                     if (err) throw err;
                 
                     db.query(`SELECT * FROM employee`, function (err, results) {
+                        // creates an array from the employee table
                         const managerArr = results.map(({ first_name, last_name, id }) => ({ 'name': first_name + " " + last_name, 'value': id }))
                         if (err) throw err;
                 
@@ -186,6 +190,7 @@ function employeeTracker () {
 
 
             case 'Update An Employee Role':
+                // concatenating within mysql for employee name legibility
                 db.query(`SELECT CONCAT(employee.first_name, ' ', employee.last_name) AS 'employee_name', employee.id FROM employee;`, function (err, results) {        
                     const empArr = results.map(({ employee_name, id }) => ({ 'name': employee_name, 'value': id }))
                     if (err) throw err;
@@ -224,4 +229,5 @@ function employeeTracker () {
     })
 }
 
+// initiates program once node server.js is opened in the terminal
 employeeTracker();

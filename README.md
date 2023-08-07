@@ -31,7 +31,7 @@ When the user has completed all questions, they will either see a table showing 
 
 
 
-A video demo of this application in action can be found [here](https://github.com/aomaits/Express.js-Note-Taker/blob/main/LICENSE).
+A video demo of this application in action can be found [here](https://drive.google.com/file/d/1fWT9rRHT4PpGGIFg00dMnOx8QYEfQ89X/view).
 
 ## Credits 
 
