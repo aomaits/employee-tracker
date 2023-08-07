@@ -11,13 +11,12 @@ const consoleTable = require('console.table');
 const db = mysql.createConnection(
     {
         host: 'localhost',
-        // MySQL username,
-        user: 'root',
-        password: 'root',
+        // TODO: Add your mysql username and password here! 
+        user: '',
+        password: '',
         database: 'employees_db'
     },
-    console.log(`Connected to the employees_db database. (remove this log later!)`)
-  );
+);
 
 function employeeTracker () {
     inquirer
@@ -40,6 +39,7 @@ function employeeTracker () {
                         console.log(err);
                     }
                     console.table(result);
+                    // return the user to the home menu after the result has rendered
                     employeeTracker();
                 });
                 break;
@@ -63,11 +63,6 @@ function employeeTracker () {
                 break;
 
             case 'View All Employees':
-                // Will return the manager's name as a column
-                // const managerName = db.query(`SELECT CONCAT(employee.first_name,' ',employee.last_name) AS 'Manager Name'
-                // FROM employee AS employee1
-                // JOIN employee
-                // ON employee1.manager_id = employee.id`)
 
                 db.query(`SELECT employee.id AS 'Employee ID', CONCAT(employee.first_name, ' ', employee.last_name) AS 'Employee Name',
                 roles.title AS 'Job Title', department.department_name AS 'Department', roles.salary AS 'Salary', 
@@ -91,113 +86,148 @@ function employeeTracker () {
                 inquirer.prompt([
                         {
                             type: 'input',
-                            name: 'name',
+                            name: 'newDept',
                             message: 'Enter the department name you would like to add:',
                         }
                 ])
                 .then(function (answers) {
-                    const newDept = answers.name;
-                    db.query(`INSERT INTO department (department.department_name) VALUES ('${newDept}')`, (err, response) => {
-                        if (err) {
-                            console.log(err);
-                        }
-                    }) 
-                }).then(
-                        // This is firing as soon as the prompt comes through...why isn't it waiting for a response?
-                db.query(`SELECT * FROM department`, (err, response) => {
-                    if (err) {
-                        console.log(err);
-                    } 
-                        console.table(response)
-                        employeeTracker();
-                }));
+                    // use a constant to hold onto the user's answer and add it to the sql query below
+                    const newDept = answers.newDept;
+                    db.promise().query(
+                        `INSERT INTO department (department.department_name) VALUES ('${newDept}')`);
+                    console.log(`'${newDept}' has been added to Departments.`)
+                }) 
+                .then(() => {
+                    employeeTracker();
+                })
                 break;
                 
             case 'Add A Role':
-                db.query(`INSERT INTO roles (title, salary, department_id) VALUES ('Financial Analyst', 86000, 1`, (err, response) => {
-                    if (err) {
-                        console.log(err);
-                    } 
-                    console.table(response)
-                    employeeTracker();
-});
-break;
-            case 'Add An Employee':
+                db.query(`SELECT * FROM department`, function (err, results) {
+                    // map over the two columns in the department table and pull out the values for each to provide choice in the third prompt below
+                    const deptsArray = results.map(({ department_name, id }) => ({ 'name': department_name, 'value': id }))
+                    
+                    inquirer.prompt([
+                    
+                        {
+                            type: 'input',
+                            name: 'newRole',
+                            message: 'Enter the name of the role that you would like to add:',
+                        },
+                        {
+                            type: 'input',
+                            name: 'newRoleSalary',
+                            message: 'Enter the salary amount for the role that you would like to add:',
+                            validate(input) {
+                                if (isNaN(input)) {
+                                    return 'You have not entered a number for the salary.'
+                                }
+                                return true;
+                            },
+                        },
+                        {
+                            type: 'list',
+                            message: 'To which department does this role belong?',
+                            name: 'departmentOptions',
+                            choices: deptsArray,
+                        }
+                    ]).then(function (answers) {
+                        // using variables here to insert the user's selections into the mysql call
+                        db.query('INSERT INTO roles (title, salary, department_id) VALUES (?, ?, ?)', [answers.newRole, answers.newRoleSalary, answers.departmentOptions], (err, results) => {
+                            console.log(`${answers.newRole} has been added to the roles table.`);
+                            employeeTracker();
+                        });
+                    })
+                })
+                break;
+
+            case 'Add An Employee':      
+                db.query(`SELECT * FROM roles`, function (err, results) { 
+                    // creates an array from the roles table
+                    const roleArr = results.map(({ title, id }) => ({ 'name': title, 'value': id }))
+                    if (err) throw err;
+                
+                    db.query(`SELECT * FROM employee`, function (err, results) {
+                        // creates an array from the employee table
+                        const managerArr = results.map(({ first_name, last_name, id }) => ({ 'name': first_name + " " + last_name, 'value': id }))
+                        if (err) throw err;
+                
+                        inquirer.prompt([
+                            {
+                                type: 'input',
+                                name: 'firstName',
+                                message: `Enter the employee's first name:`,
+                            },
+                            {
+                                type: 'input',
+                                name: 'lastName',
+                                message: `Enter the employee's last name:`,
+                            },
+                            {
+                                type: 'list',
+                                name: 'newEmpRole',
+                                message: `Select this employee's role:`,
+                                choices: roleArr
+                            },
+                            {
+                                type: 'list',
+                                name: 'newEmpManager',
+                                message: `Select the manager for this employee:`,
+                                choices: managerArr
+                            }
+                        ])
+                        .then(function (answers) {              
+                            
+                            db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`, [answers.firstName, answers.lastName, answers.newEmpRole, answers.newEmpManager], (err, results) => {
+                                if (err) throw err;
+                                console.log(`${answers.firstName} ${answers.lastName} has been added to Employees.`);
+                                employeeTracker();
+                            });
+                        });
+                    });
+                });
+                break;
+
+
             case 'Update An Employee Role':
-                console.log("Other options selected")
-            }
-        })
+                // concatenating within mysql for employee name legibility
+                db.query(`SELECT CONCAT(employee.first_name, ' ', employee.last_name) AS 'employee_name', employee.id FROM employee;`, function (err, results) {        
+                    const empArr = results.map(({ employee_name, id }) => ({ 'name': employee_name, 'value': id }))
+                    if (err) throw err;
+
+                    db.query(`SELECT * FROM roles`, function (err, results) {        
+                        const roleArr = results.map(({ title, id }) => ({ 'name': title, 'value': id }))
+                        if (err) throw err;
+
+                        inquirer.prompt([
+                            {
+                                type: 'list',
+                                message: 'Which employee are you updating?',
+                                name: 'roleUpdateEmployee',
+                                choices: empArr,
+                            },
+                            {
+                                type: 'list',
+                                message: `What of the following is the new role of this employee?`,
+                                name: 'roleList',
+                                choices: roleArr,
+                            }
+                        ])
+                        
+                        .then(function (answers) {
+                            
+                            db.query(`UPDATE employee SET employee.role_id = ? WHERE employee.id = ?`, [answers.roleList, answers.roleUpdateEmployee], (err, results) => {
+                                if (err) throw err;                          
+                                console.log(`The role of employee # ${answers.roleUpdateEmployee} has been updated`)
+                                employeeTracker();
+                            })
+                        });
+                    })
+                })
+            break;
+        }
+    })
 }
 
-console.log("did this happen at the end?")
-
+// initiates program once node server.js is opened in the terminal
 employeeTracker();
-
-//     const filename = `${response.title.toLowerCase()}.md`;
-//     const projectTitle = response.title;
-//     const descrMotiv = response.descriptionMotivation;
-//     const descrSolvProb = response.descriptionSolvedProblem;
-//     const descrLearned = response.descriptionLearned;
-//     const projectInstallation = response.installation;
-//     const projectUsage = response.usage;
-//     const licenseBadge = chosenLicenseLink;
-//     const licenseChosen = projectLicense;
-//     const projectContributions = response.contributing;
-//     const projectTests= response.tests;
-//     const gitHubUser = response.githubUsername;
-//     const userEmail = response.email;
-
-//     convertToMarkdown(filename, projectTitle, descrMotiv, descrSolvProb, descrLearned, projectInstallation, projectUsage, licenseBadge, licenseChosen, projectContributions, projectTests, gitHubUser, userEmail)
-//   });
-
-// function convertToMarkdown(filename, projectTitle, descrMotiv, descrSolvProb, descrLearned, projectInstallation, projectUsage, licenseBadge, licenseChosen, projectContributions, projectTests, gitHubUser, userEmail) {
-//     var markdownVersion = `# ${projectTitle}
-
-// # ${licenseBadge}
-
-// ## Description
-// ${descrMotiv}
-// ${descrSolvProb}
-// ${descrLearned}
-
-// ## Table of Contents
-// - [Installation](#installation)
-// - [Usage](#usage)
-// - [License](#license)
-// - [Contributing](#contributing)
-// - [Tests](#tests)
-// - [Questions](#questions)
-
-// ## Installation
-// ${projectInstallation}
-
-// ## Usage
-// ${projectUsage}
-
-// ## License
-// This project uses a ${licenseChosen} license. 
-
-// ## Contributing
-// ${projectContributions}
-
-// ## Tests
-// ${projectTests}
-
-// ## Questions
-// You can find my GitHub profile [here](https://github.com/${gitHubUser}). Please feel free to reach out to me by email at [${userEmail}](${userEmail}) with any additional questions!`;
-
-//     writeToReadMe (filename, markdownVersion);
-// };
-
-// function writeToReadMe (filename, markdownVersion) {
-//     fs.writeFile(filename, (markdownVersion), (err) =>
-//     err ? console.log(err) : console.log('Success!')
-//     );
-// }
-
-// function init() {
-    
-// }
-
-// Function call to initialize app
-// init();
