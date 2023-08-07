@@ -16,7 +16,6 @@ const db = mysql.createConnection(
         password: 'root',
         database: 'employees_db'
     },
-    console.log(`Connected to the employees_db database. (remove this log later!)`)
 );
 
 function employeeTracker () {
