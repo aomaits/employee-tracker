@@ -9,9 +9,12 @@ In order to utilize this application, the user will need to install all node pac
 ## Usage
 To begin, the user will have to open the integrated terminal and use node to open the server.js file. 
 
-![The notes page with a new note being added](./public/assets/images/NoteTaker_NoSavedNotes.jpg)
+![Opening the integrated terminal on a windows machine](./assets/openInTerminal.png)
 
-From there, the user will receive a prompt for seven different options. When selecting options that affect the data in the database, further questions will be asked of the user. 
+
+From there, the user will receive a prompt for seven different options. When selecting a course of action that will affect the data in the database, further questions will be asked of the user. 
+
+![Opening the integrated terminal on a windows machine](./assets/openInTerminal.png)
 
 When the user has completed all questions, they will either see a table showing the results of their queries or will be notified that the changes they'd requested have been made. 
 
