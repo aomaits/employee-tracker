@@ -1,17 +1,18 @@
 # Employee Tracker
 
 ## Description
-This back-end application allows a user to manipulate an employee database. This project was created to give the user more control over their employee database and the ability to interact with that data in a simple manner. 
+This back-end application allows a user to manipulate queries to a SQL employee database. This project was created to give the user te ability to interact with employee data in a simple manner. 
 
-Below is the base database I created for the project, as laid out in a google document which I referenced throughout the process. I color-coded the connected foreign-primary keys: 
+Below is the layout of the database I created for the project. I color-coded the connected foreign-primary keys for clarity: 
 
 ![database schema for the employee tracker project](./assets/mySchema.jpg)
 
 ## Installation
-In order to utilize this application, the user will need to install all node packages. They will also need to input their mysql username and password on lines 14 and 15 of the server.js file. 
+As the project reliews on several key node packages, users will have to download all node packages before initiating. 
+
+The connection configuration for the server is currently based on MySQL- if users wish to use the existing connection they will have to have an available MySQL username and password and add both to the server.js file (comments have been added to the server file for clarity). 
 
 ![Showing the empty strings on lines 14 and 15 of the server.js file that will accept the user's mysql username and password](./assets/blankMysqlConnection.jpg)
-
 
 ## Usage
 To begin, the user will have to open the integrated terminal and use node to open the server.js file. 
@@ -41,7 +42,9 @@ A video demo of this application in action can be found [here](https://drive.goo
 
 The following NPM packages were used for this project: 
 - inquirer v8.2.4
-- mysql v3.5.2
+- mysql2 v3.5.2
+- console.table v0.10.0
+- filesystem v1.0.1
 
 ## License
 A [MIT license](https://github.com/aomaits/employee-tracker/blob/main/LICENSE) was used for this project. 
