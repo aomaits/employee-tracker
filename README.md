@@ -1,7 +1,7 @@
 # Employee Tracker
 
 ## Description
-This back-end application allows a user to manipulate queries to a SQL employee database. This project was created to give the user te ability to interact with employee data in a simple manner. 
+This back-end application allows a user to manipulate queries to a SQL employee database. This project was created to give the user the ability to interact with employee data in a simple manner. 
 
 Below is the layout of the database I created for the project. I color-coded the connected foreign-primary keys for clarity: 
 
